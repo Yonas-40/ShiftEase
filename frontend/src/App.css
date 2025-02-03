@@ -1,0 +1,122 @@
+a.Evening{
+  background-color: darkblue;
+  color: white;
+}
+
+a.Day{
+  background-color: #8b2c00;
+  color: white;
+}
+
+a.Evening:hover{
+  background-color: rgb(2, 2, 171);
+  color: white;
+}
+
+a.Day:hover{
+  background-color: rgb(155, 53, 2);
+  color: white;
+}
+a.available {
+    background-color: green; /* Green background for availability */
+    color: white;
+}
+
+a.available:hover {
+    background-color: darkgreen; /* Darker green on hover */
+    color: white;
+}
+
+.fc-daygrid-event{
+    padding: 5px;
+    cursor: pointer;
+    text-wrap: wrap;
+}
+.fc-event-title{
+    word-break: break-word; /* Fallback for most browsers */
+    word-wrap: break-word;  /* Legacy support */
+    overflow-wrap: break-word; /* Modern property for better support */
+}
+
+.fc-list-event-graphic {
+    display: none; /* Hides the dot */
+}
+
+.fc-daygrid-event-dot {
+    display: none; /* Hides the dot */
+}
+
+.btn{
+    margin: 0px 3px;
+}
+
+.fc .fc-event {
+    font-size: 12px; /* Smaller text for events */
+    white-space: nowrap; /* Prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Truncate long titles */
+}
+
+.fc .fc-daygrid-event {
+    padding: 2px 4px; /* Compact padding */
+}
+.MuiFormControl-root{
+    margin: 0 0 10px 0 !important;
+}
+@media (max-width: 600px) {
+    .fc .fc-toolbar {
+        flex-wrap: wrap; /* Stack toolbar buttons */
+        flex-direction: column;
+    }
+
+    .fc .fc-daygrid-event {
+        font-size: 10px; /* Even smaller text for mobile */
+        text-wrap: wrap;
+    }
+
+    .fc-event-title {
+        display: block;
+        word-break: break-word; /* Fallback for most browsers */
+        word-wrap: break-word;  /* Legacy support */
+        overflow-wrap: break-word; /* Modern property for better support */
+
+    }
+}
+
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact; /* Ensures colors are preserved */
+    font-size: 12px; /* Adjust font size for better printing */
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse; /* Ensures table borders merge properly */
+  }
+
+  th, td {
+    padding: 5px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  /* Page break rules for long tables */
+  tr {
+    page-break-inside: avoid; /* Prevents rows from splitting across pages */
+  }
+
+  thead {
+    display: table-header-group; /* Ensures headers repeat on each page */
+  }
+
+  tbody {
+    display: table-row-group; /* Keeps rows grouped together */
+  }
+
+  button {
+    display: none; /* Hides buttons during printing */
+  }
+}
+
+/* Add this to your styles.css or an equivalent CSS file */
