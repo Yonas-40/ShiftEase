@@ -34,7 +34,6 @@ class ProfileAdmin(UserAdmin):
     readonly_fields = ('date_joined',)  # Add this line
     list_display = ('username', 'email', 'role', 'department', 'date_joined', 'is_staff', 'image')
 
-
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('profile', 'designation', 'contact_number', 'address')
@@ -67,7 +66,6 @@ class ShiftAdmin(admin.ModelAdmin):
 
     class Media:
         js = ('js/shift_time_autofill.js',)  # Path to your custom JS file in the static directory
-
 
 @admin.register(MonthlyWorkingHours)
 class MonthlyWorkingHoursAdmin(admin.ModelAdmin):

@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-qu&@@6upvvofpcus^#fsbbo&@)11tqbq%pau&gvbz8r4iv5@h@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.157', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.157', '192.168.1.79', '127.0.0.1']
 
 # Application definition
 
@@ -65,6 +65,8 @@ CORS_ALLOW_ALL_ORIGINS = True  # This allows any origin (not recommended for pro
 # Or, if you want to restrict it to your frontend's origin:
 CORS_ALLOWED_ORIGINS = [
     'http://192.168.1.157:5173',  # The URL of your React frontend
+    'http://192.168.1.79:5173',  # The URL of your React frontend
+    'http://localhost:5173'
 ]
 
 CORS_LOGGING = True
@@ -146,8 +148,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jonasasmer40@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'mazt tgxx dkyi sxjc'  # Replace with your email password or app password
+EMAIL_HOST_USER = 'jonasasmerom40@gmail.com'
+EMAIL_HOST_PASSWORD = 'mazt tgxx dkyi sxjc'
 DEFAULT_FROM_EMAIL = 'jonasasmer40@gmail.com'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

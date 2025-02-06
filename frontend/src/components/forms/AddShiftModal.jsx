@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -6,15 +6,15 @@ import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Checkbox from "@mui/material/Checkbox";
-import { fetchEmployees } from '../../services/api.jsx';
+import {fetchEmployees} from '../../services/api.jsx';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import AxiosInstance from "../AxiosInstance.jsx"; // Import AxiosInstance
 import Alert from '@mui/material/Alert';
-import { SitemarkIcon } from "../CustomIcons.jsx"; // Import custom icon
+import {SitemarkIcon} from "../CustomIcons.jsx"; // Import custom icon
 
 const shiftTypes = ['Day (7:00-15:00)', 'Evening (15:00-22:00)'];
 
-const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
+const AddShiftModal = ({open, onClose, date, onAddShift}) => {
     const [employees, setEmployees] = useState([]); // State for employee data
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [selectedShift, setSelectedShift] = useState('');
@@ -53,8 +53,15 @@ const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
             const loadEmployees = async () => {
                 try {
                     setLoading(true);
-                    const data = await fetchEmployees();
-                    setEmployees(data);
+                    const token = localStorage.getItem("access_token"); // Ensure token is retrieved here
+
+                    const response = await AxiosInstance.get(`${process.env.BACKEND_URL}/employees/`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    setEmployees(response.data);
                 } catch (error) {
                     console.error("Error fetching employees:", error);
                     setErrorMessage("Failed to load employees. Please try again.");
@@ -82,18 +89,18 @@ const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
                 : shiftTypeMap[selectedShift];
 
         const shiftPayload =
-        userRole === "employee"
-            ? {
-                  employee: employeeId,
-                  shift_date: date,
-                  shift_type: shiftTypeCode,
-                  is_available: isAvailable, // Include availability for employees
-              }
-            : {
-                  employee: employeeId,
-                  shift_date: date,
-                  shift_type: shiftTypeCode,
-              };
+            userRole === "employee"
+                ? {
+                    employee: employeeId,
+                    shift_date: date,
+                    shift_type: shiftTypeCode,
+                    is_available: isAvailable, // Include availability for employees
+                }
+                : {
+                    employee: employeeId,
+                    shift_date: date,
+                    shift_type: shiftTypeCode,
+                };
         try {
             const token = localStorage.getItem("access_token");
             if (!token) {
@@ -145,11 +152,11 @@ const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
                     p: 4,
                 }}
             >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <Typography variant="h6" component="h2">
                         {userRole === "employee" ? "Add Availability" : "Add Shift"}
                     </Typography>
-                    <SitemarkIcon sx={{ cursor: 'pointer' }} />
+                    <SitemarkIcon sx={{cursor: 'pointer'}}/>
                 </Box>
                 {authError && (
                     <Alert
@@ -159,13 +166,13 @@ const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
                                 Sign In
                             </Button>
                         }
-                        sx={{ mb: 2 }}
+                        sx={{mb: 2}}
                     >
                         No valid token found. Please sign in to continue.
                     </Alert>
                 )}
                 {errorMessage && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert severity="error" sx={{mb: 2}}>
                         {errorMessage}
                     </Alert>
                 )}
@@ -240,7 +247,7 @@ const AddShiftModal = ({ open, onClose, date, onAddShift }) => {
                     variant="contained"
                     color="primary"
                     fullWidth
-                    sx={{ mt: 2 }}
+                    sx={{mt: 2}}
                     onClick={handleSubmit}
                     disabled={!selectedShift && userRole === "employee"} // Disable if inputs are incomplete
                 >

@@ -128,7 +128,7 @@ const EmployeeTable = () => {
                     display: 'block',
                     maxWidth: {xs:'100vh', sm:'100%'},
                 }}>
-                    <table className="table" style={{ minWidth: '100vh' }}>
+                    <table className="table" style={{ minWidth: '110vh' }}>
                     <thead>
                     <tr>
                         <th style={{

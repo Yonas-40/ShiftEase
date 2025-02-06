@@ -15,8 +15,7 @@ import Employees from "./Employees.jsx";
 import EmployeeProfilePage from "./EmployeeProfilePage.jsx";
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import axios from 'axios';
-import MyIcon from '../../public/images/logo.svg';
-import {colorSchemes} from "./shared-theme/themePrimitives.jsx";
+import Tooltip from '@mui/material/Tooltip';
 import ManagerProfilePage from "./ManagerProfilePage.jsx";
 
 const demoTheme = createTheme({
@@ -43,7 +42,13 @@ function SidebarFooter({mini}) {
             component="div"
             sx={{m: 1, whiteSpace: 'nowrap', overflow: 'hidden'}}
         >
-            {mini ? '© SMS' : `© ${new Date().getFullYear()} Made with love by Yonas`}
+            {mini ? (
+                <Tooltip title="Shift Management System" arrow>
+                    <span>© SMS</span>
+                </Tooltip>
+            ) : (
+                `© ${new Date().getFullYear()} Made by Yonas Zeratsion`
+            )}
         </Typography>
     );
 }
@@ -53,6 +58,8 @@ SidebarFooter.propTypes = {
 };
 
 function ManagerDashboard() {
+    const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down('md')); // Check if the screen is small
+    const isSmScreen = useMediaQuery(theme => theme.breakpoints.down('sm')); // Only for Employees menu
     const [navigation, setNavigation] = useState([
         {
             segment: 'Manager',
@@ -81,7 +88,6 @@ function ManagerDashboard() {
         },
     ]);
     const navigate = useNavigate();
-    const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down('md')); // Check if the screen is small
     const userRole = localStorage.getItem("user_role");
     // Fetch user info with token
     const fetchUserInfo = async () => {
@@ -114,24 +120,43 @@ function ManagerDashboard() {
 
     // Fetch employee data and update the navigation menu
     useEffect(() => {
-        const loadEmployees = async () => {
-            const data = await fetchEmployees();
-            const employeeChildren = data.map((emp) => ({
-                segment: emp.username,
-                title: emp.username,
-                icon: <PersonIcon/>,
-            }));
+    const loadEmployees = async () => {
+        const data = await fetchEmployees();
+        const employeeChildren = data.map((emp) => ({
+            segment: emp.username,
+            title: emp.username,
+            icon: <PersonIcon />,
+        }));
 
-            // Update navigation with the employee names
-            setNavigation((prev) =>
-                prev.map((item) =>
-                    item.segment === 'employees' ? {...item, children: employeeChildren} : item
-                )
-            );
-        };
+        setNavigation((prev) => {
+            return prev.map((item) => {
+                if (item.segment === 'employees' || item.segment === 'employees_small') {
+                    if (isSmScreen) {
+                        // On small screens, show simplified menu
+                        return {
+                            segment: 'employees_small',
+                            title: 'Employees',
+                            path: '/employees_small',
+                            icon: <GroupsIcon />,
+                        };
+                    } else {
+                        // On larger screens, restore the full Employees menu
+                        return {
+                            segment: 'employees',
+                            title: 'Employees',
+                            path: '/employees',
+                            icon: <GroupsIcon />,
+                            children: employeeChildren,
+                        };
+                    }
+                }
+                return item;
+            });
+        });
+    };
 
-        loadEmployees();
-    }, [navigate]);
+    loadEmployees();
+}, [navigate, isSmScreen]); // Ensure effect triggers on screen size change
 
     useEffect(() => {
         const loadUserProfile = async () => {
@@ -281,6 +306,7 @@ function ManagerDashboard() {
                 <Routes>
                     <Route path="/monthlyworkinghourstable" element={<MonthlyWorkingHoursTable/>}/>
                     <Route path="/employees" element={<Employees/>}/>
+                    <Route path="/employees_small" element={<Employees/>}/>
                     <Route path="/calendar" element={<Calendar/>}/>
                     {navigation
                         .find((item) => item.segment === "employees")
