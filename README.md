@@ -43,10 +43,6 @@ npm install
 npm run dev
 ```
 
-### 4. Access the App
-- **Backend API**: `http://127.0.0.1:8000/api/`
-- **Frontend**: `http://localhost:5173/`
-
 ## 👥 User Roles & Access
 
 | Role    | Access  |
