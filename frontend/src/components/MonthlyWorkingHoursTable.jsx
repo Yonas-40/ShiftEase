@@ -64,7 +64,7 @@ const MonthlyWorkingHoursTable = () => {
                     label="Search Employee"
                     variant="outlined"
                     fullWidth
-                    size="small"
+                    size="medium"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
