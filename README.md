@@ -51,8 +51,8 @@ npm run dev
 
 | Role    | Access  |
 |---------|--------|
-| **Admin**   | Full access, manage everything |
-| **Manager** | Assign shifts, view reports |
+| **Admin**   | Full access, Add Manager,manage everything |
+| **Manager** | Assign shifts, Add, Update and Delete Employees, view reports |
 | **Employee** | View assigned shifts, update profile |
 
 ## 🤝 Contributing
