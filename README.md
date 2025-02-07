@@ -16,7 +16,7 @@ ShiftEase is a **home care employee shift management system** designed to help m
 - **Backend**: Django + PostgreSQL
 - **Frontend**: React + Vite
 - **Authentication**: Django Authentication
-- **Deployment**: Docker, Nginx, Gunicorn
+> **Deployment**: Docker, Nginx, Gunicorn
 
 ## 📦 Installation
 
