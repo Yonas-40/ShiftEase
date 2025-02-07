@@ -11,11 +11,8 @@ import {DashboardLayout} from '@toolpad/core/DashboardLayout';
 import {useNavigate, Routes, Route} from "react-router-dom";
 import MonthlyWorkingHoursTable from './MonthlyWorkingHoursTable.jsx'; // Import MonthlyWorkingHoursTable component
 import Calendar from './Calendar'; // Import Calendar component
-import Employees from "./Employees.jsx";
 import EmployeeProfilePage from "./EmployeeProfilePage.jsx";
 import axios from 'axios';
-import MyIcon from '../../public/images/logo.svg';
-import {colorSchemes} from "./shared-theme/themePrimitives.jsx";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 
 const demoTheme = createTheme({

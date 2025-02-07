@@ -84,7 +84,7 @@ class Shift(models.Model):
 
     employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='shifts')
     shift_date = models.DateField()
-    shift_type = models.CharField(max_length=3, choices=SHIFT_TYPES)
+    shift_type = models.CharField(max_length=5, choices=SHIFT_TYPES)
     shift_start_time = models.TimeField(blank=True, null=True)
     shift_end_time = models.TimeField(blank=True, null=True)
     is_weekend = models.BooleanField(default=False)  # Automatically set based on shift_date
@@ -109,7 +109,6 @@ class Shift(models.Model):
         formatted_date = self.shift_date.strftime("%A, %Y-%m-%d")  # Format the shift_date
         return (f"{self.employee.profile.username} - {self.get_shift_type_display()} on {formatted_date} - "
                 f"{'Available' if self.is_available else 'Not Available'}")
-
 
 class MonthlyWorkingHours(models.Model):
     employee = models.ForeignKey('Employee', on_delete=models.CASCADE)

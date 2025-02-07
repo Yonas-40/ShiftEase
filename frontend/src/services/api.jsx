@@ -33,8 +33,7 @@ export const addEmployee = async (employeeData) => {
         });
         return response.data;
     } catch (error) {
-        console.error('API Error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error || 'Failed to add employee');
+        throw error
     }
 };
 export const deleteEmployee = async (username) => {

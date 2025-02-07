@@ -86,31 +86,31 @@ export default function SignIn(props) {
     const navigate = useNavigate();
 
     // Function to refresh the access token
-    const refreshAccessToken = async () => {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            try {
-                const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
-                    refresh: refreshToken,
-                });
-                const {access} = response.data;
-                localStorage.setItem('access_token', access); // Store new access token
-            } catch (error) {
-                console.error('Error refreshing token:', error);
-                setIsLoggedIn(false); // Log out the user if token refresh fails
-                navigate('/login'); // Redirect to login page
-            }
-        }
-    };
+    // const refreshAccessToken = async () => {
+    //     const refreshToken = localStorage.getItem('refresh_token');
+    //     if (refreshToken) {
+    //         try {
+    //             const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+    //                 refresh: refreshToken,
+    //             });
+    //             const {access} = response.data;
+    //             localStorage.setItem('access_token', access); // Store new access token
+    //         } catch (error) {
+    //             console.error('Error refreshing token:', error);
+    //             setIsLoggedIn(false); // Log out the user if token refresh fails
+    //             navigate('/login'); // Redirect to login page
+    //         }
+    //     }
+    // };
 
     const handleClickOpen = () => {
         setIsForgotPassword(true);
-        setShowChangePassword(true);
+        setOpen(true);
     };
 
     const handleClose = () => {
         setIsForgotPassword(false);
-        setShowChangePassword(false);
+        setOpen(false);
     };
 
     const validateInputs = () => {

@@ -17,6 +17,7 @@ import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import axios from 'axios';
 import Tooltip from '@mui/material/Tooltip';
 import ManagerProfilePage from "./ManagerProfilePage.jsx";
+import AxiosInstance from "./AxiosInstance.jsx";
 
 const demoTheme = createTheme({
     cssVariables: {
@@ -90,9 +91,9 @@ function ManagerDashboard() {
     const navigate = useNavigate();
     const userRole = localStorage.getItem("user_role");
     // Fetch user info with token
+    const token = localStorage.getItem('access_token'); // Get the token from storage
     const fetchUserInfo = async () => {
         try {
-            const token = localStorage.getItem('access_token'); // Get the token from storage
             if (!token) {
                 throw new Error('No access token found. Please sign in.');
             }
@@ -118,45 +119,51 @@ function ManagerDashboard() {
         }
     };
 
-    // Fetch employee data and update the navigation menu
     useEffect(() => {
-    const loadEmployees = async () => {
-        const data = await fetchEmployees();
-        const employeeChildren = data.map((emp) => ({
-            segment: emp.username,
-            title: emp.username,
-            icon: <PersonIcon />,
-        }));
+        const loadEmployees = async () => {
+            try {
+                const response = await axios.get(`${process.env.BACKEND_URL}/employees/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-        setNavigation((prev) => {
-            return prev.map((item) => {
-                if (item.segment === 'employees' || item.segment === 'employees_small') {
-                    if (isSmScreen) {
-                        // On small screens, show simplified menu
-                        return {
-                            segment: 'employees_small',
-                            title: 'Employees',
-                            path: '/employees_small',
-                            icon: <GroupsIcon />,
-                        };
-                    } else {
-                        // On larger screens, restore the full Employees menu
-                        return {
-                            segment: 'employees',
-                            title: 'Employees',
-                            path: '/employees',
-                            icon: <GroupsIcon />,
-                            children: employeeChildren,
-                        };
-                    }
-                }
-                return item;
-            });
-        });
-    };
+                const employeeChildren = response.data.map((emp) => ({
+                    segment: emp.username,
+                    title: emp.username,
+                    icon: <PersonIcon/>,
+                }));
 
-    loadEmployees();
-}, [navigate, isSmScreen]); // Ensure effect triggers on screen size change
+                setNavigation((prev) =>
+                    prev.map((item) => {
+                        if (item.segment === 'employees' || item.segment === 'employees_small') {
+                            return isSmScreen
+                                ? {
+                                    segment: 'employees_small',
+                                    title: 'Employees',
+                                    path: '/employees_small',
+                                    icon: <GroupsIcon/>
+                                }
+                                : {
+                                    segment: 'employees',
+                                    title: 'Employees',
+                                    path: '/employees',
+                                    icon: <GroupsIcon/>,
+                                    children: employeeChildren
+                                };
+                        }
+                        return item;
+                    })
+                );
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+            }
+        };
+
+        loadEmployees();
+    }, [navigate, isSmScreen, token]); // Ensure effect triggers on dependencies change
+
 
     useEffect(() => {
         const loadUserProfile = async () => {
@@ -237,6 +244,7 @@ function ManagerDashboard() {
                             image: userData.image ? userData.image : userData.username.charAt(0).toUpperCase(),
                         },
                     });
+                    window.location.reload();
                 } catch (error) {
                     console.error('Failed to fetch user data:', error);
 
@@ -307,6 +315,7 @@ function ManagerDashboard() {
                     <Route path="/monthlyworkinghourstable" element={<MonthlyWorkingHoursTable/>}/>
                     <Route path="/employees" element={<Employees/>}/>
                     <Route path="/employees_small" element={<Employees/>}/>
+                    <Route path="/employees/:username" element={<EmployeeProfilePage/>}/>
                     <Route path="/calendar" element={<Calendar/>}/>
                     {navigation
                         .find((item) => item.segment === "employees")

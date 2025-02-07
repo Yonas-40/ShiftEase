@@ -14,7 +14,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db import IntegrityError
 from rest_framework.exceptions import ValidationError
 import logging
-
+import socket
+from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
@@ -101,6 +102,19 @@ class ResetPasswordView(APIView):
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
 
+    def get_server_ip(self):
+        # Fetch the server's IP address dynamically (ensure your server is accessible via this IP)
+        # This method can be changed to suit your needs (e.g., using a public IP for production)
+        try:
+            # Create a temporary socket connection to an external server
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 80))  # Google's public DNS
+                local_ip = s.getsockname()[0]  # Get the machine's actual local IP
+            return local_ip
+        except Exception as e:
+            print(f"Error getting local IP: {e}")
+            return "127.0.0.1"  # Fallback to localhost if error occurs
+
     def post(self, request):
         email = request.data.get('email')
         if not email:
@@ -109,23 +123,28 @@ class ForgotPasswordView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
+            logger.error(f"User with email {email} does not exist.")
             return Response({"error": "No user found with this email."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Generate password reset token
         token = default_token_generator.make_token(user)
 
+        # Get the server IP (or use an environment variable if you set a specific IP)
+        server_ip = self.get_server_ip()
+
         # Create password reset link
-        reset_link = f'http://localhost:5173/reset-password/{user.id}/{token}/'
+        reset_link = f'http://{server_ip}:5173/reset-password/{user.id}/{token}/'
 
         # Send email to user with the reset link
         try:
             send_mail(
                 'Password Reset Request',
                 f'Click the link to reset your password: {reset_link}',
-                'noreply@example.com',  # Replace with your email
+                'jonasasmer40@gmail.com',  # Replace with your email
                 [email],
             )
         except Exception as e:
+            logger.error(f"Error sending password reset email: {e}")
             return Response({"error": "Failed to send email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"message": "Password reset link sent to your email."}, status=status.HTTP_200_OK)
@@ -342,14 +361,21 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
         return Response({"message": "Employee deleted successfully."}, status=status.HTTP_200_OK)
 
+
 class EmployeeCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = EmployeeCreateSerializer
 
     def create(self, request, *args, **kwargs):
         # Handle employee creation, ensure profile is linked
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
 
+        # If serializer is valid, create the employee, otherwise return errors
+        if serializer.is_valid():
+            return super().create(request, *args, **kwargs)
+        else:
+            # Return specific error messages in a custom format
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MonthlyWorkingHoursView(APIView):
     permission_classes = [IsAuthenticated]

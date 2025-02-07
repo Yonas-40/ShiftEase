@@ -120,7 +120,8 @@ const MonthlyWorkingHoursTable = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell/>
+                            <TableCell>History</TableCell>
+                            <TableCell>#</TableCell>
                             <TableCell>Employee Name</TableCell>
                             <TableCell>Month</TableCell>
                             <TableCell>Total Hours</TableCell>
@@ -130,7 +131,7 @@ const MonthlyWorkingHoursTable = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredEmployees.map((employee) => {
+                        {filteredEmployees.map((employee, index) => {
                             const employeeData = groupedByEmployee[employee];
                             const isExpanded = expandedRows[employee] || false;
 
@@ -149,6 +150,7 @@ const MonthlyWorkingHoursTable = () => {
                                                 {isExpanded ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                                             </IconButton>
                                         </TableCell>
+                                        <TableCell>{index+1}</TableCell> {/* Display sequence number */}
                                         <TableCell>{employee}</TableCell>
                                         <TableCell>
                                             {new Date(latestMonth.month_year).toLocaleString("default", {
@@ -182,9 +184,7 @@ const MonthlyWorkingHoursTable = () => {
                                                         </TableHead>
                                                         <TableBody>
                                                             {otherMonths.map((monthData, index) => (
-                                                                <TableRow key={index} sx={{
-                                                                    backgroundColor: index % 2 === 0 ? "rgba(0, 0, 0, 0.04)" : "white",
-                                                                }}>
+                                                                <TableRow key={index}>
                                                                     <TableCell>
                                                                         {new Date(monthData.month_year).toLocaleString("default", {
                                                                             month: "long",

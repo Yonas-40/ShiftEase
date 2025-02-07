@@ -22,7 +22,7 @@ function ForgotPassword({open, handleClose}) {
 
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/forgot-password/', {email});
+            const response = await axios.post(`${process.env.BACKEND_URL}/forgot-password/`, {email});
             if (response.status === 200) {
                 alert('A password reset link has been sent to your email.');
                 handleClose();

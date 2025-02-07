@@ -2,7 +2,9 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from .models import *
 
 
@@ -205,21 +207,39 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['profile', 'designation']
 
+    def validate_profile(self, value):
+        # Check if the username is unique
+        username = value.get('username')
+        email = value.get('email')
+
+        if username and Profile.objects.filter(username=username).exists():
+            raise ValidationError(
+                f"A user with the username '{username}' already exists. Please choose a unique username.")
+            # Validate email uniqueness
+        if email and Profile.objects.filter(email=email).exists():
+            raise ValidationError(
+                f"A user with the email '{email}' already exists. Please use a different email address.")
+
+        return value
+
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
+
         # Create profile first
         profile = Profile.objects.create(**profile_data)
+
         # Assign employee role to the profile
         profile.role = 'employee'
         profile.is_password_changed = False  # Default to False for new employees
         profile.save()
+
         # Set the default password for the Profile (which is also the User instance)
         profile.set_password('Tesia123')  # This will hash the password
         profile.save()
+
         # Then create the Employee instance
         employee = Employee.objects.create(profile=profile, **validated_data)
         return employee
-
 
 class MonthlyWorkingHoursSerializer(serializers.ModelSerializer):
     formatted_total_working_hours = serializers.ReadOnlyField()

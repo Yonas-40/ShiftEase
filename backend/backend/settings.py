@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-import os
+import os, socket
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -13,7 +13,22 @@ SECRET_KEY = 'django-insecure-qu&@@6upvvofpcus^#fsbbo&@)11tqbq%pau&gvbz8r4iv5@h@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.157', '192.168.1.79', '127.0.0.1']
+# Get the local machine's IP address
+def get_local_ip():
+    """Get the local IP address of the machine."""
+    try:
+        # Create a temporary socket connection to an external server
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))  # Google's public DNS
+            local_ip = s.getsockname()[0]  # Get the machine's actual local IP
+        return local_ip
+    except Exception as e:
+        print(f"Error getting local IP: {e}")
+        return "127.0.0.1"  # Fallback to localhost if error occurs
+
+LOCAL_IP = get_local_ip()
+
+ALLOWED_HOSTS = [LOCAL_IP, '127.0.0.1']
 
 # Application definition
 
@@ -60,15 +75,15 @@ MIDDLEWARE = [
 ]
 
 # Allow all origins (for development purposes)
-CORS_ALLOW_ALL_ORIGINS = True  # This allows any origin (not recommended for production)
+CORS_ALLOW_ALL_ORIGINS = False  # This allows any origin (not recommended for production)
 
 # Or, if you want to restrict it to your frontend's origin:
 CORS_ALLOWED_ORIGINS = [
-    'http://192.168.1.157:5173',  # The URL of your React frontend
-    'http://192.168.1.79:5173',  # The URL of your React frontend
+    f'http://{LOCAL_IP}:5173',  # The URL of your React frontend
     'http://localhost:5173'
 ]
-
+# Debugging: Print the detected IP
+print(f"Detected local IP: {LOCAL_IP}")
 CORS_LOGGING = True
 
 # Optionally, allow credentials if you're using cookies or other authentication methods
@@ -98,13 +113,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'shift_db',  # Your PostgreSQL database name
+        'USER': 'postgres',  # Your PostgreSQL username
+        'PASSWORD': 'Yoni4ever',  # Your PostgreSQL password
+        'HOST': 'localhost',  # Keep this as localhost for local setup
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
-
 AUTH_USER_MODEL = 'core.Profile'
 
 # Media files
@@ -148,7 +172,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jonasasmerom40@gmail.com'
+EMAIL_HOST_USER = 'jonasasmer40@gmail.com'
 EMAIL_HOST_PASSWORD = 'mazt tgxx dkyi sxjc'
 DEFAULT_FROM_EMAIL = 'jonasasmer40@gmail.com'
 # Default primary key field type
