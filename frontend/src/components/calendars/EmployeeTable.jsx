@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {fetchEmployees, addEmployee, deleteEmployee} from '../../services/api';
-import {Box, Typography, useTheme, Button, Modal, TextField, Alert, Autocomplete} from '@mui/material';
+import {Box, Typography, useTheme, Button, Modal, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Alert, Autocomplete, Snackbar} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -9,6 +9,11 @@ import {SitemarkIcon} from "../CustomIcons.jsx";
 
 const EmployeeTable = () => {
     const [employees, setEmployees] = useState([]);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete confirmation dialog
+    const [employeeToDelete, setEmployeeToDelete] = useState(null);  // Store the employee selected for deletion
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // State for snackbar
+    const [snackbarMessage, setSnackbarMessage] = useState(""); // Message for snackbar
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Type of message
     const [open, setOpen] = useState(false); // State to manage modal visibility
     const [usernameError, setUsernameError] = useState(''); // State to track username error
     const [searchQuery, setSearchQuery] = useState("");  // Search query state
@@ -81,7 +86,7 @@ const EmployeeTable = () => {
             setTimeout(() => {
                 setSuccessMessage('');
                 handleCloseModal(); // Close modal after 2 seconds
-            }, 3000);
+            }, 2000);
         } catch (error) {
             if (error.response && error.response.data) {
                 // Check for specific errors and display them to the user
@@ -116,18 +121,45 @@ const EmployeeTable = () => {
         };
         loadEmployees();
     }, []);
-    const handleDeleteClick = async (username) => {
-        if (window.confirm("Are you sure you want to delete this employee?")) {
-            try {
-                await deleteEmployee(username); // Call the delete API
-                setEmployees((prev) => prev.filter((emp) => emp.username !== username)); // Remove from state
-                alert("Employee deleted successfully!");
-            } catch (error) {
-                console.error("Error deleting employee:", error);
-                alert("Failed to delete employee.");
-            }
+    const handleDeleteDialogOpen = (username) => {
+        setEmployeeToDelete(username);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteDialogClose = () => {
+        setDeleteDialogOpen(false);
+        setEmployeeToDelete(null);
+    };
+    const handleDeleteEmployee = async () => {
+        if (!employeeToDelete) return;
+
+        try {
+            await deleteEmployee(employeeToDelete);
+            setEmployees(prev => prev.filter(emp => emp.username !== employeeToDelete));
+
+            // Show success message in Snackbar
+            setSnackbarMessage("Employee deleted successfully!");
+            setSnackbarSeverity("success");
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Error deleting employee:", error);
+
+            // Show error message in Snackbar
+            setSnackbarMessage("Failed to delete employee.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+        } finally {
+            handleDeleteDialogClose();
         }
     };
+
+    useEffect(() => {
+        const loadEmployees = async () => {
+            const data = await fetchEmployees();
+            setEmployees(data.sort((a, b) => a.username.localeCompare(b.username)));
+        };
+        loadEmployees();
+    }, []);
 
 
     // Get all unique employee names for multi-select
@@ -136,7 +168,7 @@ const EmployeeTable = () => {
 
     // Filter employees based on search and multi-select
     const filteredEmployees = employees.filter(employee => {
-        const matchesSearch = employee.username.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = employee.username?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false;
         const isSelected = selectedEmployees.length === 0 || selectedEmployees.includes(employee.username);
         return matchesSearch && isSelected;
     });
@@ -277,7 +309,7 @@ const EmployeeTable = () => {
                                         color="error"
                                         startIcon={<DeleteIcon/>}
                                         sx={{ml: 1}}
-                                        onClick={() => handleDeleteClick(emp.username)} // Call delete function with employee ID
+                                        onClick={() => handleDeleteDialogOpen(emp.username)} // Call delete function with employee ID
                                     >
                                         Delete
                                     </Button>
@@ -405,6 +437,35 @@ const EmployeeTable = () => {
                     </form>
                 </Box>
             </Modal>
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete <strong>{employeeToDelete}</strong>? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteEmployee} color="error" autoFocus>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Snackbar for Notifications */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

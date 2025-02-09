@@ -11,8 +11,7 @@ function getLocalIP() {
     for (const iface of interfaces[name]) {
       if (
         iface.family === 'IPv4' &&
-        !iface.internal &&
-        iface.address.startsWith('192.168.')
+        !iface.internal
       ) {
         localIP = iface.address;
       }
