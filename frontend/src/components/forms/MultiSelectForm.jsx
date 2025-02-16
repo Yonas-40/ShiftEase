@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 64;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -15,7 +15,9 @@ const MenuProps = {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
     },
+    autoFocus: false,
   },
+  autoFocus: false,
 };
 
 export default function MultiSelectForm({ label, options, setSelectedValue, selectedValue, width }) {
@@ -32,6 +34,8 @@ export default function MultiSelectForm({ label, options, setSelectedValue, sele
   };
 
   if (!options || options.length === 0) return <p>No options available</p>;
+
+  const sortedOptions = [...options].sort((a, b) => a.localeCompare(b));
 
   return (
     <div>
@@ -59,7 +63,7 @@ export default function MultiSelectForm({ label, options, setSelectedValue, sele
             />
             <ListItemText primary="Select All" />
           </MenuItem>
-          {options.map((option) => (
+          {sortedOptions.map((option) => (
             <MenuItem key={option} value={option}>
               <Checkbox checked={selectedValue.includes(option)} />
               <ListItemText primary={option} />

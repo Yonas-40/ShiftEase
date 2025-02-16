@@ -49,6 +49,11 @@ a.available:hover {
 .btn{
     margin: 0px 3px;
 }
+.fc .fc-daygrid-week-number {
+  color:var(--mui-palette-text-primary);
+}
+
+
 
 .fc .fc-event {
     font-size: 12px; /* Smaller text for events */

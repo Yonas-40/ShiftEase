@@ -1,8 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from datetime import time, timedelta
+from datetime import time
+import os
+
+def get_image_upload_to(instance, filename):
+    # Use the username to create a custom filename
+    extension = filename.split('.')[-1]  # Get file extension
+    username = instance.username  # Get the username from the instance
+    new_filename = f"{username}_{instance.pk}.{extension}"  # Combine username and ID for a unique filename
+    return os.path.join('Pictures', new_filename)  # You can adjust the path as needed
 
 
 class Profile(AbstractUser):
@@ -18,7 +25,7 @@ class Profile(AbstractUser):
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     email = models.EmailField(unique=True)
-    image = models.ImageField(upload_to='Pictures/', blank=True, null=True)
+    image = models.ImageField(upload_to=get_image_upload_to, blank=True, null=True)
     is_password_changed = models.BooleanField(default=False)  # New flag
 
     USERNAME_FIELD = 'email'
@@ -32,11 +39,9 @@ class Profile(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.email})"
 
-
 class EmployeeQuerySet(models.QuerySet):
     def for_employees(self):
         return self.filter(profile__role='employee')
-
 
 class Employee(models.Model):
     profile = models.OneToOneField(
@@ -67,10 +72,6 @@ class Employee(models.Model):
     @address.setter
     def address(self, value):
         self._address = value
-
-
-from datetime import time
-from django.db import models
 
 class Shift(models.Model):
     SHIFT_TYPES = [
@@ -111,7 +112,7 @@ class Shift(models.Model):
                 f"{'Available' if self.is_available else 'Not Available'}")
 
 class MonthlyWorkingHours(models.Model):
-    employee = models.ForeignKey('Employee', on_delete=models.CASCADE)
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name="working_hours")
     month_year = models.DateField()  # Store the month and year (e.g., '2024-12-01')
 
     total_working_hours = models.FloatField(default=0)  # Store working hours as float (hours)

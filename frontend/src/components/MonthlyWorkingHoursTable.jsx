@@ -47,14 +47,14 @@ const MonthlyWorkingHoursTable = () => {
     };
 
     // Get all unique employee names for multi-select
-    const employeeNames = Object.keys(groupedByEmployee);
+    const employeeNames = Object.keys(groupedByEmployee).sort((a, b) => a.localeCompare(b));
 
     // Filter employees based on search and multi-select
     const filteredEmployees = employeeNames.filter(employee => {
         const matchesSearch = employee.toLowerCase().includes(searchQuery.toLowerCase());
         const isSelected = selectedEmployees.length === 0 || selectedEmployees.includes(employee);
         return matchesSearch && isSelected;
-    });
+    }); // Sort alphabetically
 
     return (
         <Paper sx={{padding: "20px"}}>

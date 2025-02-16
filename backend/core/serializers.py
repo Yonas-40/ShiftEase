@@ -13,10 +13,13 @@ class ShiftSerializer(ModelSerializer):
     start = serializers.SerializerMethodField()  # Combine date and start time
     end = serializers.SerializerMethodField()  # Combine date and end time
     classNames = serializers.SerializerMethodField()  # Use readable shift type
+    shift_types = serializers.SerializerMethodField()
+    shift_type = serializers.CharField()  # Add this line
+    employee_id = serializers.IntegerField(source='employee.id', read_only=True)  # Employee ID field
 
     class Meta:
         model = Shift
-        fields = ('id', 'start', 'end', 'classNames', 'title')
+        fields = ('id', 'start', 'end', 'classNames', 'title', 'employee_id', 'shift_types', 'shift_type')
 
     def get_start(self, obj):
         # Combine date and start time for FullCalendar
@@ -32,6 +35,10 @@ class ShiftSerializer(ModelSerializer):
             return 'available'  # Use a different class for availability events
         else:
             return obj.get_shift_type_display()  # Use readable shift type for shift events
+
+    def get_shift_types(self, obj):
+        # Return the shift types (DAY, EVE) for the frontend
+        return dict(Shift.SHIFT_TYPES)
 
 # serializers.py
 class ShiftCreateSerializer(serializers.ModelSerializer):

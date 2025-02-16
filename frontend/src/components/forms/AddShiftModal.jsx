@@ -149,10 +149,11 @@ const AddShiftModal = ({open, onClose, date, onAddShift}) => {
                     width: 400,
                     bgcolor: 'background.paper',
                     boxShadow: 24,
+                    outline: 'none',
                     p: 4,
                 }}
             >
-                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding:'0 0 25px'}}>
                     <Typography variant="h6" component="h2">
                         {userRole === "employee" ? "Add Availability" : "Add Shift"}
                     </Typography>

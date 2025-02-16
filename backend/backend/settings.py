@@ -2,14 +2,14 @@ from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-import os, socket
+import os
+import socket
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qu&@@6upvvofpcus^#fsbbo&@)11tqbq%pau&gvbz8r4iv5@h@'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -125,7 +125,7 @@ DATABASES = {
         'NAME': 'shift_db',  # Your PostgreSQL database name
         'USER': 'postgres',  # Your PostgreSQL username
         'PASSWORD': 'Yoni4ever',  # Your PostgreSQL password
-        'HOST': 'localhost',  # Keep this as localhost for local setup
+        'HOST': '192.168.1.34', #'localhost',  # Keep this as localhost for local setup
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
@@ -172,10 +172,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jonasasmer40@gmail.com'
-EMAIL_HOST_PASSWORD = 'mazt tgxx dkyi sxjc'
-DEFAULT_FROM_EMAIL = 'jonasasmer40@gmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

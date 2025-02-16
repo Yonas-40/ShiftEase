@@ -18,10 +18,8 @@ import socket
 from django.conf import settings
 logger = logging.getLogger(__name__)
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
 
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,7 +28,6 @@ class UserProfileView(APIView):
         user = request.user
         serializer = UserProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class SignInView(APIView):
     permission_classes = [IsAuthenticated]  # Open access for everyone
@@ -70,9 +67,7 @@ class SignInView(APIView):
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
-
 User = get_user_model()  # Dynamically get the custom user model
-
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]  # Allow unauthenticated users
@@ -97,7 +92,6 @@ class ResetPasswordView(APIView):
         user.save()
 
         return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
-
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
@@ -149,7 +143,6 @@ class ForgotPasswordView(APIView):
 
         return Response({"message": "Password reset link sent to your email."}, status=status.HTTP_200_OK)
 
-
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -169,7 +162,6 @@ class ChangePasswordView(APIView):
         # Return success message
         return Response({"message": "Password changed successfully!"}, status=status.HTTP_200_OK)
 
-
 class ShiftViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Shift.objects.all()
@@ -187,70 +179,6 @@ class ShiftViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-class ApproveShiftView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, id):
-        shift = get_object_or_404(Shift, pk=id)
-        user = request.user
-
-        # Check if the user is an admin or manager
-        if user.role not in ['manager', 'admin']:
-            return Response({"error": "You do not have permission to approve shifts."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        # Update shift availability to false (approved)
-        shift.is_available = False
-        shift.save()
-
-        return Response({"message": "Shift approved successfully."}, status=status.HTTP_200_OK)
-
-class RejectShiftView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, id):
-        shift = get_object_or_404(Shift, pk=id)
-        user = request.user
-
-        # Check if the user is an admin or manager
-        if user.role not in ['manager', 'admin']:
-            return Response({"error": "You do not have permission to reject shifts."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        # Delete the shift
-        shift.delete()
-
-        return Response({"message": "Shift rejected successfully."}, status=status.HTTP_200_OK)
-
-class ManagerProfileView(viewsets.GenericViewSet):
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = Profile.objects.all()  # Or you could use a filter like .filter(role='manager')
-    serializer_class = UserProfileSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        # Check if the username exists
-        try:
-            profile = Profile.objects.get(username=kwargs['username'])
-        except Profile.DoesNotExist:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        return Response(UserProfileSerializer(profile).data)
-
-        # Custom endpoint to update an individual employee by username
-    def update(self, request, username=None, *args, **kwargs):
-        # Fetch the profile with username directly
-        profile = get_object_or_404(Profile, username=username)
-
-        # You can add permission check here (e.g., only manager or admin can update)
-        if request.user != profile and not request.user.is_staff:
-            return Response({"error": "You do not have permission to update this profile."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        serializer = self.get_serializer(profile, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ShiftCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -304,6 +232,189 @@ class ShiftCreateView(generics.CreateAPIView):
 
         except ValidationError as e:
             return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user != profile and not request.user.is_staff:
+            return Response({"error": "You do not have permission to update this profile."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ApproveShiftView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+        shift = get_object_or_404(Shift, pk=id)
+        user = request.user
+
+        # Check if the user is an admin or manager
+        if user.role not in ['manager', 'admin']:
+            return Response({"error": "You do not have permission to approve shifts."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Update shift availability to false (approved)
+        shift.is_available = False
+        shift.save()
+
+        return Response({"message": "Shift approved successfully."}, status=status.HTTP_200_OK)
+
+class RejectShiftView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+        shift = get_object_or_404(Shift, pk=id)
+        user = request.user
+
+        # Check if the user is an admin or manager
+        if user.role not in ['manager', 'admin']:
+            return Response({"error": "You do not have permission to reject shifts."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Delete the shift
+        shift.delete()
+
+        return Response({"message": "Shift rejected successfully."}, status=status.HTTP_200_OK)
+
+class MoveShiftView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, shift_id):
+        user = request.user
+
+        # Fetch the existing shift
+        old_shift = get_object_or_404(Shift, pk=shift_id)
+
+        # Authorization check
+        if user.role not in ['manager', 'admin']:
+            return Response({"error": "You do not have permission to move shifts."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Get the new date from the request
+        new_date = request.data.get('new_date')
+
+        if not new_date:
+            return Response({'error': 'New date is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Convert to date object
+        try:
+            new_date = datetime.strptime(new_date, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({'error': 'Invalid date format. Expected YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if a shift already exists for the employee on the new date with the same shift type
+        if Shift.objects.filter(employee=old_shift.employee, shift_date=new_date, shift_type=old_shift.shift_type).exists():
+            return Response({"error": "A shift already exists for this employee on the new date with the same type."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Prepare data for the new shift
+        data = {
+            'employee': old_shift.employee.id,
+            'shift_date': new_date,
+            'shift_type': old_shift.shift_type,
+            'is_available': old_shift.is_available,
+        }
+
+        # Create a new shift using the serializer
+        serializer = ShiftCreateSerializer(data=data, context={'request': request})
+
+        if serializer.is_valid():
+            try:
+                new_shift = serializer.save()
+                old_shift.delete()
+                return Response({
+                    "message": "Shift moved successfully.",
+                    "new_shift": ShiftSerializer(new_shift).data
+                }, status=status.HTTP_200_OK)
+
+            except IntegrityError as e:  # In case of DB unique constraint issues
+                return Response({
+                    "error": "Database error while moving the shift.",
+                    "details": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "error": "Validation failed when moving the shift.",
+            "details": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+class CopyShiftView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        employee_id = request.data.get('employee')
+        shift_date = request.data.get('shift_date')
+        shift_type = request.data.get('shift_type')
+
+        if not employee_id or not shift_date or not shift_type:
+            return Response({'error': 'Employee, shift_date, and shift_type are required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if user.role not in ['manager', 'admin']:
+            return Response({"error": "You do not have permission to copy shifts."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            shift_date = datetime.strptime(shift_date, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({'error': 'Invalid shift_date format. Expected format: YYYY-MM-DD.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        employee = get_object_or_404(Employee, pk=employee_id)
+
+        if Shift.objects.filter(employee=employee, shift_date=shift_date, shift_type=shift_type).exists():
+            return Response({
+                "error": "Shift already exists for this employee on the selected date and type."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data = {
+            'employee': employee.id,
+            'shift_date': shift_date,
+            'shift_type': shift_type,
+            'is_available': False,
+        }
+
+        serializer = ShiftCreateSerializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            try:
+                new_shift = serializer.save()
+                return Response({
+                    "message": "Shift copied successfully.",
+                    "shift": ShiftSerializer(new_shift).data
+                }, status=status.HTTP_201_CREATED)
+
+            except IntegrityError as e:
+                return Response({
+                    "error": "Database error while copying the shift.",
+                    "details": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "error": "Validation failed when copying the shift.",
+            "details": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+class ManagerProfileView(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Profile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        profile = get_object_or_404(Profile, username=username)
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        profile = get_object_or_404(Profile, username=username)
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]  # Adjust permissions as needed
@@ -354,13 +465,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         if not employee:
             return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        employee.shifts.all().delete()
         # Delete the employee's user profile first
         employee.profile.delete()
         # Delete the employee instance
         employee.delete()
 
         return Response({"message": "Employee deleted successfully."}, status=status.HTTP_200_OK)
-
 
 class EmployeeCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
@@ -399,4 +510,3 @@ class MonthlyWorkingHoursView(APIView):
         # Serialize the data
         serializer = MonthlyWorkingHoursSerializer(working_hours, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-

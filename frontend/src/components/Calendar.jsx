@@ -24,17 +24,28 @@ const Calendar = () => {
     const token = localStorage.getItem('access_token'); // Get the token from storage
     const GetShiftData = () => {
         AxiosInstance.get(`${process.env.BACKEND_URL}/shifts/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-                },
-            })
+            headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            },
+        })
             .then((res) => {
-                setEvents(res.data);
-                setStatusOptions([...new Set(res.data.map((event) => event.classNames))]);
-                setSelectedStatus([...new Set(res.data.map((event) => event.classNames))]);
+                const eventsWithExtendedProps = res.data.map((event) => {
+                // Get the shift type as string (e.g., 'Day Shift' or 'Evening Shift')
+                return {
+                    ...event,
+                    extendedProps: {
+                        employee: event.employee_id, // Add employee data to extendedProps
+                        shift_type: event.shift_type, // Use the string representation of the shift type
+                    }
+                };
+            });
 
-                setEmployeeOptions([...new Set(res.data.map((event) => event.title))]);
-                setSelectedEmployees([...new Set(res.data.map((event) => event.title))]);
+                setEvents(eventsWithExtendedProps);
+                setStatusOptions([...new Set(eventsWithExtendedProps.map((event) => event.classNames))]);
+                setSelectedStatus([...new Set(eventsWithExtendedProps.map((event) => event.classNames))]);
+
+                setEmployeeOptions([...new Set(eventsWithExtendedProps.map((event) => event.title))]);
+                setSelectedEmployees([...new Set(eventsWithExtendedProps.map((event) => event.title))]);
 
                 setLoading(false);
             })
@@ -84,8 +95,8 @@ const Calendar = () => {
                                             width: {
                                                 xs: '100%', sm: '20%'
                                             },
-                                            margin:0,
-                                            padding:0,
+                                            margin: 0,
+                                            padding: 0,
                                         }}
                                     >
                                         <MultiSelectForm
@@ -98,8 +109,8 @@ const Calendar = () => {
                                     <Box
                                         sx={{
                                             width: {xs: '100%', sm: '20%'},
-                                            margin:0,
-                                            padding:0,// Full width on xs, 20% on larger screens
+                                            margin: 0,
+                                            padding: 0,// Full width on xs, 20% on larger screens
                                         }}
                                     >
                                         <MultiSelectForm
@@ -126,7 +137,7 @@ const Calendar = () => {
                                     </Box>
                                 </Box>
 
-                                <Box sx={{boxShadow: 3, padding: {xs: '0', sm: '20px'}}}>
+                                <Box sx={{boxShadow: 3, padding: {xs: '0', sm: '20px'}}} id="calendar-container" tabIndex={-1}>
                                     <MyCalendar myEvents={filteredEvents} onAddShift={GetShiftData}/>
                                 </Box>
                             </div>

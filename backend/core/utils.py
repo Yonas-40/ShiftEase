@@ -69,7 +69,6 @@ def calculate_monthly_hours(employee):
         }
     )
 
-
 class Command(BaseCommand):
     help = 'Calculate monthly working hours for each employee'
 

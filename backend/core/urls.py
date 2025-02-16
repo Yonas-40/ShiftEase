@@ -27,6 +27,8 @@ urlpatterns = [
     # New endpoints for approve and reject shift
     path('api/shift/approve/<int:id>/', ApproveShiftView.as_view(), name='approve-shift'),
     path('api/shift/reject/<int:id>/', RejectShiftView.as_view(), name='reject-shift'),
+    path('api/shift/move/<int:shift_id>/', MoveShiftView.as_view(), name='move-shift'),
+    path('api/shift/copy/', CopyShiftView.as_view(), name='copy-shift'),
 ]
 
 urlpatterns += router.urls
