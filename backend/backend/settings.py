@@ -123,10 +123,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'shift_db',  # Your PostgreSQL database name
-        'USER': 'postgres',  # Your PostgreSQL username
-        'PASSWORD': 'Yoni4ever',  # Your PostgreSQL password
-        'HOST': '192.168.1.34', #'localhost',  # Keep this as localhost for local setup
-        'PORT': '5432',  # Default PostgreSQL port
+        'USER': os.getenv('DB_USER'), # Your PostgreSQL username
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # Your PostgreSQL password
+        'HOST': os.getenv('DB_HOST', 'localhost'), #'localhost',  # Keep this as localhost for local setup
+        'PORT': os.getenv('DB_PORT', '5432'), # Default PostgreSQL port
     }
 }
 AUTH_USER_MODEL = 'core.Profile'

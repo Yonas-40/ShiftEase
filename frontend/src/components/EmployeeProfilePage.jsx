@@ -350,7 +350,7 @@ const EmployeeProfilePage = () => {
                 </Box>
             </form>
             {/* Snackbar for Alerts */}
-            <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert({ ...alert, open: false })}>
+            <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert({ ...alert, open: false })} anchorOrigin={{vertical: "top", horizontal: "center"}}>
                 <Alert onClose={() => setAlert({ ...alert, open: false })} severity={alert.severity} sx={{ width: "100%" }}>
                     {alert.message}
                 </Alert>

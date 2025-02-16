@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import {Box, Button, TextField, Typography} from "@mui/material";
+import {Alert, Box, Button, Snackbar, TextField, Typography} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
@@ -20,6 +20,7 @@ const ManagerProfilePage = () => {
     });
     const [previewImage, setPreviewImage] = useState(null); // State for image preview
     const userRole = localStorage.getItem("user_role");
+    const [alert, setAlert] = useState({open: false, message: "", severity: "success"});
     const token = localStorage.getItem('access_token');
     // Fetch employee data by username
     useEffect(() => {
@@ -98,11 +99,20 @@ const ManagerProfilePage = () => {
                 },
             }
         );
-        alert("Manager details updated successfully!");
-        navigate('/calendar');
+        setAlert({
+                open: true,
+                message: userRole === 'Manager' ? "Manager details updated successfully!" : "Admin details updated successfully!",
+                severity: "success",
+        });
+
+        setTimeout(() => navigate("/calendar"), 2000); // Redirect after 2 seconds
     } catch (error) {
         console.error("Error updating manager profile:", error);
-        alert("Failed to update manager details.");
+        setAlert({
+                open: true,
+                message: userRole === 'Manager' ? "Failed to update Manager details." : "Failed to update Admin details.",
+                severity: "error",
+            });
     }
 };
 
@@ -342,6 +352,12 @@ const ManagerProfilePage = () => {
                     </Button>
                 </Box>
             </form>
+            {/* Snackbar for Alerts */}
+            <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert({ ...alert, open: false })} anchorOrigin={{vertical: "top", horizontal: "center"}}>
+                <Alert onClose={() => setAlert({ ...alert, open: false })} severity={alert.severity} sx={{ width: "100%" }}>
+                    {alert.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
