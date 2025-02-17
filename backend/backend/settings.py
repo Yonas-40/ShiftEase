@@ -13,22 +13,22 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Get the local machine's IP address
-def get_local_ip():
-    """Get the local IP address of the machine."""
-    try:
-        # Create a temporary socket connection to an external server
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.connect(("8.8.8.8", 80))  # Google's public DNS
-            local_ip = s.getsockname()[0]  # Get the machine's actual local IP
-        return local_ip
-    except Exception as e:
-        print(f"Error getting local IP: {e}")
-        return "127.0.0.1"  # Fallback to localhost if error occurs
+# # Get the local machine's IP address
+# def get_local_ip():
+#     """Get the local IP address of the machine."""
+#     try:
+#         # Create a temporary socket connection to an external server
+#         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+#             s.connect(("8.8.8.8", 80))  # Google's public DNS
+#             local_ip = s.getsockname()[0]  # Get the machine's actual local IP
+#         return local_ip
+#     except Exception as e:
+#         print(f"Error getting local IP: {e}")
+#         return "127.0.0.1"  # Fallback to localhost if error occurs
+#
+# LOCAL_IP = get_local_ip()
 
-LOCAL_IP = get_local_ip()
-
-ALLOWED_HOSTS = [LOCAL_IP, '127.0.0.1']
+ALLOWED_HOSTS = ['shiftease.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -81,11 +81,8 @@ CORS_ALLOW_ALL_ORIGINS = False  # This allows any origin (not recommended for pr
 
 # Or, if you want to restrict it to your frontend's origin:
 CORS_ALLOWED_ORIGINS = [
-    f'http://{LOCAL_IP}:5173',  # The URL of your React frontend
     'http://localhost:5173'
 ]
-# Debugging: Print the detected IP
-print(f"Detected local IP: {LOCAL_IP}")
 CORS_LOGGING = True
 
 # Optionally, allow credentials if you're using cookies or other authentication methods
@@ -133,9 +130,15 @@ DATABASES = {
 }
 AUTH_USER_MODEL = 'core.Profile'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
