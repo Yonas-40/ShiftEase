@@ -121,13 +121,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shift_db',  # Your PostgreSQL database name
-        'USER': os.getenv('DB_USER'), # Your PostgreSQL username
-        'PASSWORD': os.getenv('DB_PASSWORD'),  # Your PostgreSQL password
-        'HOST': os.getenv('DB_HOST', 'localhost'), #'localhost',  # Keep this as localhost for local setup
-        'PORT': os.getenv('DB_PORT', '5432'), # Default PostgreSQL port
+        'NAME': os.getenv('DB_NAME', 'shift_db'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
+
 AUTH_USER_MODEL = 'core.Profile'
 
 STATIC_URL = '/static/'
