@@ -234,7 +234,16 @@ const MyCalendar = ({myEvents, locale = 'en', onAddShift}) => {
             },
         },
     ] : [
-        {target: '.fc-daygrid-day', content: 'Click on a date to set your availability.'}
+        {
+            target: '.fc-daygrid-day',
+            content: 'Click on a date to set your availability.',
+            styles: {
+                options: {
+                    backgroundColor: theme.palette.background.default,
+                    textColor: theme.palette.text.primary,
+                },
+            },
+        }
     ];
     const handleTourFinish = (data) => {
         const {status} = data;
