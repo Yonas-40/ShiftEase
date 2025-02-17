@@ -477,6 +477,7 @@ const MyCalendar = ({myEvents, locale = 'en', onAddShift}) => {
             </Tooltip>
             {/* Your FullCalendar setup below */}
             <FullCalendar
+                key={currentView}  // 👈 Add this line to force re-render when view changes
                 plugins={[dayGridPlugin, timeGridPlugin, listPlugin, multiMonthPlugin, interactionPlugin]}
                 initialView={currentView}
                 locale={locale}
@@ -486,7 +487,7 @@ const MyCalendar = ({myEvents, locale = 'en', onAddShift}) => {
                 events={myEvents}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
-                editable={true}
+                editable={userRole !== 'employee'}
                 eventDrop={handleEventDrop}
                 eventAllow={(dropInfo, draggedEvent) => {
                     // Prevent dragging if the event has 'available' className
