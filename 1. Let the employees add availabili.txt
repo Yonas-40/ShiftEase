@@ -1,3 +1,0 @@
-✅ 1. Let the employees add availability days on the shift calendar instead of adding shifts. cuz employees shouldn't have the possibility to add any shifts to other employees.
-✅ 2. MonthelyWorkingHours should just show the working hours for the signed in user(right now it shows all employees working hours)
-3. The newly added employees should get an email with their account information like password and email and other information that has been added by the manager

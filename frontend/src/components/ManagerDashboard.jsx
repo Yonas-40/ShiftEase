@@ -164,7 +164,6 @@ function ManagerDashboard() {
         loadEmployees();
     }, [navigate, isSmScreen, token]); // Ensure effect triggers on dependencies change
 
-
     useEffect(() => {
         const loadUserProfile = async () => {
             try {
