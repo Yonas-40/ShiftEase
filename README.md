@@ -52,7 +52,7 @@ This project uses a modern, decoupled architecture:
 ## 🗄️ Database Schema
 
 <!-- This is a PRO move. It shows you understand data modeling. -->
-![Database Schema Diagram](/path/to/your/database-schema.png) <!-- Optional but impressive -->
+![Database Schema Diagram](/assets/ERD-Database-schema.png) <!-- Optional but impressive -->
 
 
 ## 🚦 Getting Started (Local Development)
