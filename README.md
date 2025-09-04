@@ -2,7 +2,7 @@
 
 A full-stack web application designed to simplify employee scheduling and shift management for businesses. Managers can create, edit, and publish schedules, while employees can view their upcoming shifts, request time off, and swap shifts with coworkers.
 
-![Shiftease App Screenshot](/path/to/your/screenshot.png) <!-- See Step 3 -->
+![Shiftease App Screenshot](/assets/screenshot-calendar-view.png) <!-- See Step 3 -->
 
 ## 🚀 Live Demo
 
