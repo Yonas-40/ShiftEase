@@ -13,8 +13,8 @@ Experience the application live:
 ## 📁 Source Code
 
 This is a full-stack project comprised of two separate codebases:
-*   **Frontend Repository:** [github.com/Yonas-40/shiftease-frontend](https://github.com/Yonas-40/shiftease-frontend-latest)
-*   **Backend Repository:** [github.com/Yonas-40/shiftease-backend](https://github.com/Yonas-40/shiftease-backend-latest)
+*   **Frontend Repository:** [github.com/Yonas-40/shiftease-frontend](https://github.com/Yonas-40/shiftease-frontend)
+*   **Backend Repository:** [github.com/Yonas-40/shiftease-backend](https://github.com/Yonas-40/shiftease-backend)
 
 ## ✨ Features
 
